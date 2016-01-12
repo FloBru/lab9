@@ -10,17 +10,18 @@ void writeToFile(const double* const u, const string s, const double dx,
                  const double xmin, const int N);
 void initialize(double* const u, const double dx, const double xmin,
                 const int N);
+void upwind(double* u1, double* u0, double V, double dt, const double dx, const int N);
 //---------------------------------------
 int main(){
 
-  const double tEnd = ;
-  const double V = ;
+  const double tEnd = 5;
+  const double V = 1;
 
-  const int N  = ;
+  const int N  = 256;
   const double xmin = -10;
   const double xmax =  10;
   const double dx = (xmax-xmin)/(N-1);
-  double dt = ;
+  double dt = (dx/V)*2.0;
   const int Na = 10; // Number of output files up to tEnd
   const int Nk = int(tEnd/Na/dt);
 
@@ -38,7 +39,11 @@ int main(){
   {
    for(int j=0; j<Nk; j++){
 
-      // Put call to step function here
+      upwind(u1, u0, V, dt, dx, N);
+      h = u1;
+      u1 = u0;
+      u0 = h;
+    // Put call to step function here
 
       // swap arrays u0 <-> u1,
       // however do not copy values, be more clever ;)
@@ -79,3 +84,21 @@ void writeToFile(const double* const u, const string s, const double dx,
    }
    out.close();
 }
+
+void upwind(double* u1, double* u0, double V, double dt, const double dx, const int N)
+{
+  u1[0] = ((-V*dt)/dx)*(u0[0])+u0[0];
+for (int i = 1; i < N; i++)
+  {
+      u1[i] = ((-V*dt)/dx)*(u0[i]-u0[i-1])+u0[i]; 
+    }
+  }
+  
+
+
+
+
+
+
+
+
